@@ -23,23 +23,16 @@ void loop() {
 }
 
 void parseCommand() {
-  int index = 0;
-  int int_size = sizeof(int);
-
-  char buffer[10];
   byte cmd = bluetooth->read();
-
   Serial.println("Comando: " + String(cmd));
 
   if (cmd == MOTOR_CONTROL) { // Aqui serão lidos 4 bytes
-
-    for (int i = 0; i < int_size * 2; i++) {
-      char a = bluetooth->read();
-      buffer[index++] = a;
-      delayMicroseconds(100);
-    }
-
+    uint8_t buffer[4];
+    uint8_t int_size = sizeof(int);
     int left=0, right=0;
+
+    bluetooth->readBytes(buffer, 4);
+
     for (int i = 0; i < int_size * 2; i++) {
       if (i < int_size) {
         left = (buffer[i] << (8 * i)) | left;
@@ -50,10 +43,6 @@ void parseCommand() {
     }
 
     Serial.println("Velocidades ==> " + String(left) + " -=- " + String(right));
-
-    for (int i = 0; i < 4; i++) {
-      Serial.println(buffer[i], DEC);
-    }
   }
 }
 
